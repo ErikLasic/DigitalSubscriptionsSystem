@@ -5,8 +5,6 @@ Dobrodošli v repozitoriju Digital Subscriptions System – mikrostoritvenega si
 📖 Opis projekta
 Ta projekt je sestavljen iz treh mikrostoritev in spletne aplikacije, ki služi kot uporabniški vmesnik:
 
-🔹 Mikrostoritve (services/)
-
 # Uporabniki (services/uporabniki)
 Upravljanje registracije, prijave in uporabniških podatkov.
 Avtentikacija in avtorizacija uporabnikov.
@@ -19,11 +17,11 @@ Prikaz podrobnosti o posamezni reviji.
 Uporabniki lahko kupijo naročnino na izbrano revijo.
 Upravljanje naročnin (aktivacija, podaljšanje, preklic).
 
-🔹 Spletna aplikacija (frontend/)
+# Spletna aplikacija (frontend/)
 Uporabniški vmesnik za dostop do sistema.
 Omogoča ogled revij, naročanje in upravljanje naročnin.
 
-🔹 Dokumentacija (docs/)
+# Dokumentacija (docs/)
 Opis arhitekture in tehnologij.
 Navodila za namestitev in razvoj.
 🛠️ Arhitektura in tehnološki sklad
