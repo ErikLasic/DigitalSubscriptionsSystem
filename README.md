@@ -1,4 +1,5 @@
 📌 Digital Subscriptions System
+
 Dobrodošli v repozitoriju Digital Subscriptions System – mikrostoritvenega sistema za upravljanje digitalnih naročnin na revije. Sistem omogoča registracijo uporabnikov, upravljanje revij in naročnin, pri čemer sledi arhitekturnim načelom čiste arhitekture (Clean Architecture).
 
 📖 Opis projekta
