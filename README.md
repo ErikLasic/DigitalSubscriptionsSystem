@@ -19,18 +19,20 @@ Upravljanje naročnin (aktivacija, podaljšanje, preklic).
 
 # Spletna aplikacija (frontend/)
 Uporabniški vmesnik za dostop do sistema.
-Omogoča ogled revij, naročanje in upravljanje naročnin.
+Omogoča registracijo in prijavo, ogled revij, naročanje in upravljanje naročnin.
 
 # Dokumentacija (docs/)
 Opis arhitekture in tehnologij.
-Navodila za namestitev in razvoj.
-🛠️ Arhitektura in tehnološki sklad
-🔸 Arhitekturna načela:
+
+## 🛠️ Arhitektura in tehnološki sklad
+## 🔸 Arhitekturna načela:
 ✔ Čista arhitektura (Clean Architecture): ločitev poslovne logike od infrastrukture.
+
 ✔ Mikrostoritve: vsaka storitev je neodvisna in komunicira prek API-jev.
+
 ✔ Ohlapna sklopljenost: spremembe v eni storitvi ne vplivajo na druge.
 
-🔸 Tehnologije, ki jih bomo uporabili:
+## 🔸 Tehnologije, ki jih bomo uporabili:
 
 Backend: ...
 Frontend: ...
