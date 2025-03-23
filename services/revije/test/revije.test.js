@@ -36,8 +36,10 @@ describe('Revije Service Tests', () => {
     // Set up gRPC client for testing
     client = new revijeProto.RevijeService('localhost:50051', grpc.credentials.createInsecure());
 
+    const mongoUri = process.env.MONGO_URI || 'mongodb+srv://eriklasic:j0LivIehDD0I38pZ@revije.y2asa.mongodb.net/?retryWrites=true&w=majority&appName=revije';
+
     // Connect to MongoDB
-    await mongoose.connect('mongodb://localhost:27017/revije', { useNewUrlParser: true, useUnifiedTopology: true });
+    await mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
 
     // Create a sample Revija to get a valid ID
     const revija = new Revija({
