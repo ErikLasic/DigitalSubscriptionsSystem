@@ -23,8 +23,18 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: ./services/revije  # Nastavi delovno mapo na services/revije
+        working-directory: ./services/revije
+
+      - name: Start MongoDB container
+        run: |
+          docker pull mongo:latest
+          docker run --name mongodb -d -p 27017:27017 mongo:latest
+          # Wait for MongoDB to be ready
+          sleep 30
+
+      - name: Check MongoDB logs
+        run: docker logs mongodb
 
       - name: Run unit tests
         run: npx jest
-        working-directory: ./services/revije  # Nastavi delovno mapo na services/revije
+        working-directory: ./services/revije
