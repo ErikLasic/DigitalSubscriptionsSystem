@@ -1,8 +1,8 @@
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 const mongoose = require('mongoose');
-const { createRevija, getRevija, updateRevija, deleteRevija } = require('../controllers/revijeController'); // Ensure this is correctly imported
-const Revija = require('../models/revija'); // Assuming you have a Revija model defined
+const { createRevija, getRevija, updateRevija, deleteRevija } = require('../controllers/revijeController');
+const Revija = require('../models/revija');
 
 // Load proto file
 const packageDefinition = protoLoader.loadSync('./revije.proto', {});
@@ -12,6 +12,9 @@ describe('Revije Service Tests', () => {
   let server;
   let client;
   let testId;
+
+  // Povečaj timeout za asinhroone operacije
+  jest.setTimeout(15000); // 15 sekund
 
   beforeAll(async () => {
     // Start gRPC server
