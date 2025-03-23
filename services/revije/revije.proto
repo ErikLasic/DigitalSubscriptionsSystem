@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package revije;
+
+service RevijeService {
+  rpc CreateRevija (CreateRevijaRequest) returns (Revija);
+  rpc GetRevija (GetRevijaRequest) returns (Revija);
+  rpc UpdateRevija (UpdateRevijaRequest) returns (Revija);
+  rpc DeleteRevija (DeleteRevijaRequest) returns (DeleteResponse);
+}
+
+message CreateRevijaRequest {
+  string naziv = 1;
+  string opis = 2;
+}
+
+message GetRevijaRequest {
+  string id = 1;
+}
+
+message UpdateRevijaRequest {
+  string id = 1;
+  string naziv = 2;
+  string opis = 3;
+}
+
+message DeleteRevijaRequest {
+  string id = 1;
+}
+
+message Revija {
+  string id = 1;
+  string naziv = 2;
+  string opis = 3;
+}
+
+message DeleteResponse {
+  bool success = 1;
+}

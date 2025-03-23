@@ -1,0 +1,20 @@
+version: '3'
+services:
+  revije:
+    build: .
+    ports:
+      - "50051:50051"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/revije
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - revije_db:/data/db
+
+volumes:
+  revije_db:
