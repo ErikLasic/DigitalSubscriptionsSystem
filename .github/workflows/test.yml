@@ -23,6 +23,8 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./services/revije  # Nastavi delovno mapo na services/revije
 
       - name: Run unit tests
         run: npx jest
+        working-directory: ./services/revije  # Nastavi delovno mapo na services/revije
