@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package revije;
+
+option go_package = "github.com/ErikLasic/DigitalSubscriptionsSystem/services/revije/proto";
+
+service RevijeService {
+    rpc DodajRevijo(Revija) returns (Response);
+    rpc PridobiRevijo(RevijaRequest) returns (Revija);
+    rpc IzbrisiRevijo(RevijaRequest) returns (Response);
+}
+
+message Revija {
+    string id = 1;
+    string naslov = 2;
+    string avtor = 3;
+    int32 leto_izdaje = 4;
+}
+
+message RevijaRequest {
+    string id = 1;
+}
+
+message Response {
+    string message = 1;
+}
