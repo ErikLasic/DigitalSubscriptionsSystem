@@ -17,8 +17,10 @@ const logger = winston.createLogger({
 const packageDefinition = protoLoader.loadSync('./revije.proto', {});
 const revijeProto = grpc.loadPackageDefinition(packageDefinition).revije;
 
+const mongoUri = process.env.MONGO_URI || 'mongodb+srv://eriklasic:j0LivIehDD0I38pZ@revije.y2asa.mongodb.net/?retryWrites=true&w=majority&appName=revije';
+
 // Povezava z MongoDB
-mongoose.connect('mongodb://localhost:27017/revije')
+mongoose.connect(mongoUri)
   .then(() => {
     logger.info('MongoDB connected');
   })
