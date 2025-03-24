@@ -16,17 +16,15 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.10'
+          python-version: '3.10'  # Correct Python version
 
       - name: Install dependencies
         run: |
-          cd uporabniki  # Change to the 'uporabniki' directory
           python -m venv venv
           source venv/bin/activate
-          pip install -r requirements.txt  # Install dependencies from 'requirements.txt' in 'uporabniki'
+          pip install -r uporabniki/requirements.txt
 
       - name: Run tests
         run: |
-          cd uporabniki  # Change to the 'uporabniki' directory
           source venv/bin/activate
-          pytest test_app.py  # Run tests from 'test_app.py' in 'uporabniki'
+          pytest
