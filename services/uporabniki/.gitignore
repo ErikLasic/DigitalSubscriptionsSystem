@@ -17,9 +17,6 @@ ENV/
 # Logs
 *.log
 
-# Configuration files
-config.py
-
 # IDE/editor folders
 .idea/
 .vscode/
