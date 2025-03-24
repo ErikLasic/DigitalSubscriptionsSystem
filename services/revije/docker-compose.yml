@@ -5,7 +5,7 @@ services:
     ports:
       - "50051:50051"
     environment:
-      - MONGO_URI=mongodb+srv://eriklasic:j0LivIehDD0I38pZ@revije.y2asa.mongodb.net/?retryWrites=true&w=majority&appName=revije
+      - MONGO_URI=mongodb+srv://eriklasic:j0LivIehDD0I38pZ@revije.y2asa.mongodb.net/revije?retryWrites=true&w=majority&appName=revije
     depends_on:
       - mongo
 
