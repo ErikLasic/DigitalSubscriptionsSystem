@@ -22,9 +22,9 @@ jobs:
         run: |
           python -m venv venv  # Create a virtual environment
           source venv/bin/activate  # Activate the virtual environment
-          pip install -r uporabniki/requirements.txt  # Install dependencies from the 'requirements.txt' in 'uporabniki'
+          pip install -r services/uporabniki/requirements.txt  # Install dependencies from the 'requirements.txt' in 'uporabniki' folder
 
       - name: Run tests
         run: |
           source venv/bin/activate  # Activate the virtual environment
-          pytest uporabniki/test_app.py  # Run tests from 'test_app.py' in 'uporabniki'
+          pytest services/uporabniki/test_app.py  # Run tests from 'test_app.py' in 'uporabniki'
