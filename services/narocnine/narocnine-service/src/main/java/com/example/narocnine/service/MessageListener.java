@@ -11,6 +11,14 @@ import reactor.core.publisher.Mono;
 public class MessageListener {
     private static final Logger logger = LoggerFactory.getLogger(MessageListener.class);
 
+
+    private final MessageProducer messageProducer;
+
+    // Constructor accepting MessageProducer
+    public MessageListener(MessageProducer messageProducer) {
+        this.messageProducer = messageProducer;
+    }
+
     @RabbitListener(queues = RabbitConfig.QUEUE_NAME)
     public Mono<Void> receiveMessage(String message) {
         logger.info("Received message from RabbitMQ: {}", message);
@@ -18,6 +26,7 @@ public class MessageListener {
             try {
                 // Tukaj bi lahko implementirali logiko obdelave sporočil
                 logger.debug("Processing received message: {}", message);
+                messageProducer.sendMessage("Processed: " + message);
             } catch (Exception e) {
                 logger.error("Error processing received message", e);
             }

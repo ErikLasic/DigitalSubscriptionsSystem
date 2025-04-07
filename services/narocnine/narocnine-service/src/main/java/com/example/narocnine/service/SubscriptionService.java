@@ -19,6 +19,11 @@ public class SubscriptionService {
     @Autowired
     private MessageProducer messageProducer;
 
+    public SubscriptionService(SubscriptionRepository subscriptionRepository, MessageProducer messageProducer) {
+        this.subscriptionRepository = subscriptionRepository;
+        this.messageProducer = messageProducer;
+    }
+
     public Mono<Subscription> getSubscription(String id) {
         logger.info("Fetching subscription with id: {}", id);
         return subscriptionRepository.findById(id)
