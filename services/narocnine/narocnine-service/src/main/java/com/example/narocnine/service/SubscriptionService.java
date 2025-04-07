@@ -2,6 +2,8 @@ package com.example.narocnine.service;
 
 import com.example.narocnine.model.Subscription;
 import com.example.narocnine.repository.SubscriptionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -9,34 +11,42 @@ import reactor.core.publisher.Mono;
 @Service
 public class SubscriptionService {
 
+    private static final Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
+
     @Autowired
     private SubscriptionRepository subscriptionRepository;
 
     @Autowired
-    private MessageProducer messageProducer; // Injecting the message producer
+    private MessageProducer messageProducer;
 
     public Mono<Subscription> getSubscription(String id) {
-        return subscriptionRepository.findById(id);
+        logger.info("Fetching subscription with id: {}", id);
+        return subscriptionRepository.findById(id)
+                .doOnSuccess(subscription -> logger.info("Retrieved subscription: {}", subscription))
+                .doOnError(error -> logger.error("Error fetching subscription with id: {}", id, error));
     }
 
     public Mono<Subscription> createSubscription(Subscription subscription) {
-        // Save the subscription to MongoDB
+        logger.info("Creating new subscription: {}", subscription);
         return subscriptionRepository.save(subscription)
-                .doOnTerminate(() -> {
-                    // Send message to RabbitMQ after saving the subscription
-                    messageProducer.sendMessage("Created subscription: " + subscription.getId())
-                            .subscribe(); // Subscribe to fire the event asynchronously
-                });
+                .doOnSuccess(savedSubscription -> {
+                    logger.info("Successfully created subscription with id: {}", savedSubscription.getId());
+                    messageProducer.sendMessage("Created subscription: " + savedSubscription.getId())
+                            .doOnSuccess(ignored -> logger.info("Sent message for created subscription: {}", savedSubscription.getId()))
+                            .subscribe();
+                })
+                .doOnError(error -> logger.error("Error creating subscription", error));
     }
 
     public Mono<Void> cancelSubscription(String id) {
-        // Delete the subscription from MongoDB
+        logger.info("Cancelling subscription with id: {}", id);
         return subscriptionRepository.deleteById(id)
-                .doOnTerminate(() -> {
-                    // Send message to RabbitMQ after canceling the subscription
+                .doOnSuccess(ignored -> {
+                    logger.info("Successfully canceled subscription: {}", id);
                     messageProducer.sendMessage("Canceled subscription: " + id)
-                            .subscribe(); // Subscribe to fire the event asynchronously
-                });
+                            .doOnSuccess(ignoredMsg -> logger.info("Sent message for canceled subscription: {}", id))
+                            .subscribe();
+                })
+                .doOnError(error -> logger.error("Error canceling subscription with id: {}", id, error));
     }
 }
-
