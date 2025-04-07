@@ -57,10 +57,11 @@ jobs:
           cd services/narocnine/narocnine-service
           mvn test
 
-      # Step 8: Build Docker image (optional, if you want to containerize your app)
+      # Step 8: Build Docker image (ensure Dockerfile is in the correct directory)
       - name: Build Docker image
         run: |
-          # Ensure Dockerfile is present in the root directory or adjust path
+          # Navigate to the directory containing the Dockerfile
+          cd services/narocnine/narocnine-service
           docker build -t my-springboot-app .
 
       # Step 9: Push Docker image to DockerHub (optional)
