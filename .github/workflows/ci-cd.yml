@@ -1,60 +1,91 @@
-name: CI/CD Pipeline for Spring Boot Application
+name: Spring Boot CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main, master, develop ]
   pull_request:
-    branches:
-      - main
+    branches: [ main, master ]
 
 jobs:
-  build:
+  build-test:
     runs-on: ubuntu-latest
 
+    services:
+      # Set up MongoDB service for testing
+      mongodb:
+        image: mongo:4.4
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongo --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      # Set up RabbitMQ service for testing
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --health-cmd "rabbitmqctl status"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-      # Step 1: Check out the repository code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Java environment (JDK 17)
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'adoptopenjdk'  # Specify distribution (can be 'adoptopenjdk', 'zulu', 'amazon', etc.)
+          distribution: 'temurin'
+          cache: maven
 
-      # Step 3: Cache Maven dependencies to speed up builds (optional)
-      - name: Cache Maven dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-      # Step 4: Build the application using Maven
       - name: Build with Maven
-        run: mvn clean install -DskipTests
+        run: mvn -B package --file pom.xml
 
-      # Step 5: Run tests
       - name: Run tests
         run: mvn test
+        
+      - name: Build application
+        run: mvn -B clean package -DskipTests
+        
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+          
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2  # Changed from v3 to v2
+        with:
+          name: application-jar
+          path: target/*.jar
 
-      # Step 6: Build Docker image (optional, if you want to containerize your app)
-      - name: Build Docker image
-        run: docker build -t my-springboot-app .
-
-      # Step 7: Push Docker image to DockerHub (optional)
-      - name: Push Docker image to DockerHub (optional)
-        if: success()
+  # Deployment job - only runs on main/master branch
+  deploy:
+    needs: build-test
+    if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2  # Changed from v3 to v2
+        with:
+          name: application-jar
+          path: target
+          
+      # You would add deployment steps here depending on your deployment strategy
+      # Examples include:
+      
+      - name: Deploy to staging
         run: |
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          docker tag my-springboot-app:latest myusername/my-springboot-app:latest
-          docker push myusername/my-springboot-app:latest
-
-      # Step 8: Deploy Application (optional)
-      - name: Deploy Application (optional)
-        run: |
-          echo "Deploying the application..."
-          # Add your deployment commands here
+          echo "Deploying to staging environment"
+          # Add your deployment scripts here
+          # For example, you might use SSH to deploy to a server
+          # or deploy to a cloud service like AWS, Azure, or GCP
