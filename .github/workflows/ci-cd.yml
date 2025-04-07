@@ -33,19 +33,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # Step 4: Verify that pom.xml is in the correct location (debugging)
+      # Step 4: Verify the files and location of pom.xml
       - name: List files to check for pom.xml
         run: |
           ls -R
-
+          
       # Step 5: Navigate to the project directory where pom.xml is located
       - name: Navigate to project directory
         run: |
           cd services/narocnine/narocnine-service
+          # List files to ensure pom.xml is present
+          ls
 
       # Step 6: Build the application using Maven
       - name: Build with Maven
-        run: mvn clean install -DskipTests
+        run: |
+          cd services/narocnine/narocnine-service
+          mvn clean install -DskipTests
 
       # Step 7: Run tests
       - name: Run tests
