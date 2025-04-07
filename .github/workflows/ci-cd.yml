@@ -33,19 +33,26 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # Step 4: Build the application using Maven
+      # Step 4: Verify that pom.xml is in the right location (debugging)
+      - name: List files to check for pom.xml
+        run: |
+          ls -R
+
+      # Step 5: Build the application using Maven
       - name: Build with Maven
         run: mvn clean install -DskipTests
 
-      # Step 5: Run tests
+      # Step 6: Run tests
       - name: Run tests
         run: mvn test
 
-      # Step 6: Build Docker image (optional, if you want to containerize your app)
+      # Step 7: Build Docker image (optional, if you want to containerize your app)
       - name: Build Docker image
-        run: docker build -t my-springboot-app .
+        run: |
+          # Ensure Dockerfile is present in the root directory or adjust path
+          docker build -t my-springboot-app .
 
-      # Step 7: Push Docker image to DockerHub (optional)
+      # Step 8: Push Docker image to DockerHub (optional)
       - name: Push Docker image to DockerHub (optional)
         if: success()
         run: |
@@ -53,7 +60,7 @@ jobs:
           docker tag my-springboot-app:latest myusername/my-springboot-app:latest
           docker push myusername/my-springboot-app:latest
 
-      # Step 8: Deploy Application (optional)
+      # Step 9: Deploy Application (optional)
       - name: Deploy Application (optional)
         run: |
           echo "Deploying the application..."
