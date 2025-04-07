@@ -60,9 +60,8 @@ jobs:
       # Step 8: Build Docker image (ensure Dockerfile is in the correct directory)
       - name: Build Docker image
         run: |
-          # Navigate to the directory containing the Dockerfile
           cd services/narocnine/narocnine-service
-          docker build -t my-springboot-app .
+          docker build -t my-springboot-app -f Dockerfile .
 
       # Step 9: Push Docker image to DockerHub (optional)
       - name: Push Docker image to DockerHub (optional)

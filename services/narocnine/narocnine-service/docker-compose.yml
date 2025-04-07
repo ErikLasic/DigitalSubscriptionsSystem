@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   narocnine-service:
-    build: .
+    build: ./services/narocnine/narocnine-service  # Path to the service directory
     container_name: narocnine-service
     ports:
       - "8080:8080"
