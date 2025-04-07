@@ -62,17 +62,3 @@ jobs:
         run: |
           cd services/narocnine/narocnine-service
           docker build -t my-springboot-app -f Dockerfile .
-
-      # Step 9: Push Docker image to DockerHub (optional)
-      - name: Push Docker image to DockerHub (optional)
-        if: success()
-        run: |
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          docker tag my-springboot-app:latest myusername/my-springboot-app:latest
-          docker push myusername/my-springboot-app:latest
-
-      # Step 10: Deploy Application (optional)
-      - name: Deploy Application (optional)
-        run: |
-          echo "Deploying the application..."
-          # Add your deployment commands here

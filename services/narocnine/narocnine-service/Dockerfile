@@ -1,11 +1,14 @@
 # Use OpenJDK as the base image for building
 FROM openjdk:17-jdk-slim as build
 
+# Install Maven
+RUN apt-get update && apt-get install -y maven
+
 # Set the working directory
 WORKDIR /app
 
 # Copy the Maven build file and download dependencies
-COPY pom.xml . 
+COPY pom.xml .
 RUN mvn dependency:go-offline
 
 # Copy the source code into the container
