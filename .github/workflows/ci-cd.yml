@@ -1,52 +1,91 @@
-name: CI/CD Pipeline
+name: Spring Boot CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main, master, develop ]
   pull_request:
-    branches:
-      - main
+    branches: [ main, master ]
 
 jobs:
-  build:
+  build-test:
     runs-on: ubuntu-latest
 
+    services:
+      # Set up MongoDB service for testing
+      mongodb:
+        image: mongo:4.4
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongo --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      # Set up RabbitMQ service for testing
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --health-cmd "rabbitmqctl status"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-    - name: Check out repository
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v2
-      with:
-        java-version: '17'
-        distribution: 'temurin'
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
 
-    - name: Cache Maven dependencies
-      uses: actions/cache@v2
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
 
-    - name: Build with Maven
-      run: mvn clean install -DskipTests
+      - name: Run tests
+        run: mvn test
+        
+      - name: Build application
+        run: mvn -B clean package -DskipTests
+        
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+          
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: application-jar
+          path: target/*.jar
 
-    - name: Build Docker image
-      run: docker build -t narocnine-service .
-
-    - name: Run tests with Maven
-      run: mvn test
-
-    - name: Push Docker image to Docker Hub
-      if: github.ref == 'refs/heads/main'
-      run: |
-        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-        docker tag narocnine-service:latest your-dockerhub-username/narocnine-service:latest
-        docker push your-dockerhub-username/narocnine-service:latest
-
-    - name: Deploy to Docker Compose (optional)
-      if: github.ref == 'refs/heads/main'
-      run: |
-        docker-compose -f docker-compose.yml up -d
+  # Deployment job - only runs on main/master branch
+  deploy:
+    needs: build-test
+    if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: application-jar
+          path: target
+          
+      # You would add deployment steps here depending on your deployment strategy
+      # Examples include:
+      
+      - name: Deploy to staging
+        run: |
+          echo "Deploying to staging environment"
+          # Add your deployment scripts here
+          # For example, you might use SSH to deploy to a server
+          # or deploy to a cloud service like AWS, Azure, or GCP
