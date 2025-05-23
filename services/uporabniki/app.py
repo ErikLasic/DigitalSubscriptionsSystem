@@ -33,6 +33,7 @@ def create_app():
     swagger = Swagger(app)
 
     # JWT Authentication Decorator
+        # Popravi token_required, da posreduje dekodiran uporabnik
     def token_required(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
@@ -45,11 +46,35 @@ def create_app():
 
             try:
                 data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
-            except:
+                current_user = User.find_by_email(mongo, data['email'])
+                if not current_user:
+                    return jsonify({"message": "User not found!"}), 404
+            except jwt.ExpiredSignatureError:
+                return jsonify({"message": "Token has expired!"}), 403
+            except Exception as e:
+                logger.error(f"JWT decode error: {e}")
                 return jsonify({"message": "Token is invalid!"}), 403
 
-            return f(*args, **kwargs)
+            return f(current_user, *args, **kwargs)
         return decorated_function
+
+    # Endpoint za pridobitev trenutno prijavljenega uporabnika
+    @app.route('/me', methods=['GET'])
+    @token_required
+    def get_current_user(current_user):
+        """
+        Get the current logged-in user's data.
+        ---
+        security:
+          - bearerAuth: []
+        responses:
+          200:
+            description: User data retrieved successfully
+        """
+        return jsonify({
+            "username": current_user.username,
+            "email": current_user.email
+        }), 200
 
     # User Registration Endpoint
     @app.route('/register', methods=['POST'])
