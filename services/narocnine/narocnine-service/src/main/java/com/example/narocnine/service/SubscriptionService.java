@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -29,6 +30,12 @@ public class SubscriptionService {
         return subscriptionRepository.findById(id)
                 .doOnSuccess(subscription -> logger.info("Retrieved subscription: {}", subscription))
                 .doOnError(error -> logger.error("Error fetching subscription with id: {}", id, error));
+    }
+
+    public Flux<Subscription> getSubscriptionsByUser(String userId) {
+        logger.info("Fetching subscriptions for user: {}", userId);
+        return subscriptionRepository.findByUserId(userId)
+                .doOnError(error -> logger.error("Error fetching subscriptions for user: {}", userId, error));
     }
 
     public Mono<Subscription> createSubscription(Subscription subscription) {

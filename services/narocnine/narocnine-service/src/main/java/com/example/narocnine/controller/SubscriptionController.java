@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -20,6 +21,12 @@ public class SubscriptionController {
     public Mono<Subscription> getSubscription(@PathVariable String id) {
         logger.info("GET request received for subscription ID: {}", id);
         return subscriptionService.getSubscription(id);
+    }
+
+    @GetMapping("/user/{userId}")
+    public Flux<Subscription> getSubscriptionsByUser(@PathVariable String userId) {
+        logger.info("GET request received for subscriptions of user ID: {}", userId);
+        return subscriptionService.getSubscriptionsByUser(userId);
     }
 
     @PostMapping
