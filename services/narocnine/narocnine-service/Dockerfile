@@ -29,5 +29,5 @@ COPY --from=build /app/target/narocnine-service-0.0.1-SNAPSHOT.jar /app/narocnin
 # Expose the port the application will run on
 EXPOSE 8080
 
-# Run the application
+# Run the application#
 ENTRYPOINT ["java", "-jar", "narocnine-service.jar"]
