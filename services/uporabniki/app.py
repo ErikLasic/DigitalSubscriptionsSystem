@@ -5,35 +5,31 @@ from models import User
 import jwt
 import datetime
 from functools import wraps
-from werkzeug.security import check_password_hash  # Correct import for checking hashed passwords
+from werkzeug.security import check_password_hash
 from flasgger import Swagger
 import logging
 
-# Initialize logger
+# Logging configuration
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s %(levelname)s %(message)s',  # Include timestamp, log level, and message
+    format='%(asctime)s %(levelname)s %(message)s',
     handlers=[
-        logging.FileHandler('app.log'),  # Log messages to a file
-        logging.StreamHandler()  # Also log to the console
+        logging.FileHandler('app.log'),
+        logging.StreamHandler()
     ]
 )
 
 logger = logging.getLogger(__name__)
 
-# Create Flask app with Swagger
+# Create Flask app
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Initialize MongoDB connection
     mongo = PyMongo(app)
-
-    # Initialize Swagger for automatic API documentation
-    swagger = Swagger(app)
+    Swagger(app)
 
     # JWT Authentication Decorator
-        # Popravi token_required, da posreduje dekodiran uporabnik
     def token_required(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
@@ -58,7 +54,6 @@ def create_app():
             return f(current_user, *args, **kwargs)
         return decorated_function
 
-    # Endpoint za pridobitev trenutno prijavljenega uporabnika
     @app.route('/me', methods=['GET'])
     @token_required
     def get_current_user(current_user):
@@ -72,64 +67,71 @@ def create_app():
             description: User data retrieved successfully
         """
         return jsonify({
-            "username": current_user.username,
-            "email": current_user.email
-        }), 200
+    "id": current_user.id,
+    "username": current_user.username,
+    "email": current_user.email
+}), 200
 
-    # User Registration Endpoint
     @app.route('/register', methods=['POST'])
     def register_user():
         """
         Register a new user.
         ---
-        parameters:
-          - name: username
-            in: body
-            required: true
-            type: string
-          - name: email
-            in: body
-            required: true
-            type: string
-          - name: password
-            in: body
-            required: true
-            type: string
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - username
+                  - email
+                  - password
+                properties:
+                  username:
+                    type: string
+                  email:
+                    type: string
+                  password:
+                    type: string
         responses:
           201:
             description: User registered successfully
           400:
-            description: User already exists
+            description: User already exists or invalid input
         """
         data = request.get_json()
+        if not data or not all(k in data for k in ('username', 'email', 'password')):
+            return jsonify({"message": "Missing required fields!"}), 400
 
-        # Check if user with the same email exists
-        existing_user = User.find_by_email(mongo, data['email'])
-        if existing_user:
+        if User.find_by_email(mongo, data['email']):
             logger.warning(f"Attempted registration with existing email: {data['email']}")
             return jsonify({"message": "User already exists!"}), 400
 
-        # Create a new user
         user = User(data['username'], data['email'], data['password'])
         user.save(mongo)
         logger.info(f"User registered successfully: {data['email']}")
         return jsonify({"message": "User registered successfully!"}), 201
 
-    # User Login Endpoint
     @app.route('/login', methods=['POST'])
     def login_user():
         """
         Log in an existing user.
         ---
-        parameters:
-          - name: email
-            in: body
-            required: true
-            type: string
-          - name: password
-            in: body
-            required: true
-            type: string
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - email
+                  - password
+                properties:
+                  email:
+                    type: string
+                  password:
+                    type: string
         responses:
           200:
             description: Login successful
@@ -137,33 +139,26 @@ def create_app():
             description: Invalid credentials
         """
         data = request.get_json()
-
-        logger.debug(f"Attempting login with email: {data['email']}")
+        if not data or not all(k in data for k in ('email', 'password')):
+            return jsonify({"message": "Missing email or password!"}), 400
 
         user = User.find_by_email(mongo, data['email'])
-        if not user:
-            logger.warning(f"Login attempt failed, user not found: {data['email']}")
+        if not user or not check_password_hash(user.password, data['password']):
+            logger.warning(f"Invalid login attempt for email: {data['email']}")
             return jsonify({"message": "Invalid credentials!"}), 401
 
-        # Check if password matches
-        if not check_password_hash(user.password, data['password']):
-            logger.warning(f"Login attempt failed, password does not match for user: {data['email']}")
-            return jsonify({"message": "Invalid credentials!"}), 401
-
-        # Create JWT token
-        payload = {
+        token = jwt.encode({
             "email": user.email,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Expiry after 1 hour
-        }
-        token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        }, app.config['SECRET_KEY'], algorithm='HS256')
 
         logger.info(f"Login successful for user: {data['email']}")
         return jsonify({"token": token}), 200
 
-    # Example Protected Endpoint (You can enable it by removing the comment)
+    # Example protected endpoint
     # @app.route('/protected', methods=['GET'])
     # @token_required
-    # def protected():
-    #     return jsonify({"message": "This is a protected endpoint!"}), 200
+    # def protected(current_user):
+    #     return jsonify({"message": f"Welcome {current_user.username}, this is protected!"})
 
     return app
