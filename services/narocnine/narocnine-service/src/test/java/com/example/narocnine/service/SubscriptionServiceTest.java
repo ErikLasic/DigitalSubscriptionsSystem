@@ -33,13 +33,16 @@ class SubscriptionServiceTest {
         Subscription subscription = new Subscription();
         subscription.setId(subscriptionId);
         subscription.setUserId("user1");
-        subscription.setMagazineName("Magazine");
-        subscription.setStatus("active");
+        subscription.setMagazineId("T5454");  // popravljeno glede na model
 
         when(subscriptionRepository.findById(subscriptionId)).thenReturn(Mono.just(subscription));
 
         StepVerifier.create(subscriptionService.getSubscription(subscriptionId))
-                .expectNextMatches(sub -> sub.getId().equals(subscriptionId))
+                .expectNextMatches(sub -> 
+                    sub.getId().equals(subscriptionId) &&
+                    "user1".equals(sub.getUserId()) &&
+                    "T5454".equals(sub.getMagazineId())
+                )
                 .verifyComplete();
     }
 }
