@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0crevije.proto\x12\x06revije\"2\n\x13\x43reateRevijaRequest\x12\r\n\x05naziv\x18\x01 \x01(\t\x12\x0c\n\x04opis\x18\x02 \x01(\t\"\x1e\n\x10GetRevijaRequest\x12\n\n\x02id\x18\x01 \x01(\t\">\n\x13UpdateRevijaRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\r\n\x05naziv\x18\x02 \x01(\t\x12\x0c\n\x04opis\x18\x03 \x01(\t\"!\n\x13\x44\x65leteRevijaRequest\x12\n\n\x02id\x18\x01 \x01(\t\"1\n\x06Revija\x12\n\n\x02id\x18\x01 \x01(\t\x12\r\n\x05naziv\x18\x02 \x01(\t\x12\x0c\n\x04opis\x18\x03 \x01(\t\"!\n\x0e\x44\x65leteResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x32\x85\x02\n\rRevijeService\x12;\n\x0c\x43reateRevija\x12\x1b.revije.CreateRevijaRequest\x1a\x0e.revije.Revija\x12\x35\n\tGetRevija\x12\x18.revije.GetRevijaRequest\x1a\x0e.revije.Revija\x12;\n\x0cUpdateRevija\x12\x1b.revije.UpdateRevijaRequest\x1a\x0e.revije.Revija\x12\x43\n\x0c\x44\x65leteRevija\x12\x1b.revije.DeleteRevijaRequest\x1a\x16.revije.DeleteResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0crevije.proto\x12\x06revije\"2\n\x13\x43reateRevijaRequest\x12\r\n\x05naziv\x18\x01 \x01(\t\x12\x0c\n\x04opis\x18\x02 \x01(\t\"\x1e\n\x10GetRevijaRequest\x12\n\n\x02id\x18\x01 \x01(\t\">\n\x13UpdateRevijaRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\r\n\x05naziv\x18\x02 \x01(\t\x12\x0c\n\x04opis\x18\x03 \x01(\t\"!\n\x13\x44\x65leteRevijaRequest\x12\n\n\x02id\x18\x01 \x01(\t\"1\n\x06Revija\x12\n\n\x02id\x18\x01 \x01(\t\x12\r\n\x05naziv\x18\x02 \x01(\t\x12\x0c\n\x04opis\x18\x03 \x01(\t\"!\n\x0e\x44\x65leteResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"\x13\n\x11ListRevijeRequest\"4\n\x12ListRevijeResponse\x12\x1e\n\x06revije\x18\x01 \x03(\x0b\x32\x0e.revije.Revija2\xca\x02\n\rRevijeService\x12;\n\x0c\x43reateRevija\x12\x1b.revije.CreateRevijaRequest\x1a\x0e.revije.Revija\x12\x35\n\tGetRevija\x12\x18.revije.GetRevijaRequest\x1a\x0e.revije.Revija\x12;\n\x0cUpdateRevija\x12\x1b.revije.UpdateRevijaRequest\x1a\x0e.revije.Revija\x12\x43\n\x0c\x44\x65leteRevija\x12\x1b.revije.DeleteRevijaRequest\x1a\x16.revije.DeleteResponse\x12\x43\n\nListRevije\x12\x19.revije.ListRevijeRequest\x1a\x1a.revije.ListRevijeResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -43,6 +43,10 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_REVIJA']._serialized_end=256
   _globals['_DELETERESPONSE']._serialized_start=258
   _globals['_DELETERESPONSE']._serialized_end=291
-  _globals['_REVIJESERVICE']._serialized_start=294
-  _globals['_REVIJESERVICE']._serialized_end=555
+  _globals['_LISTREVIJEREQUEST']._serialized_start=293
+  _globals['_LISTREVIJEREQUEST']._serialized_end=312
+  _globals['_LISTREVIJERESPONSE']._serialized_start=314
+  _globals['_LISTREVIJERESPONSE']._serialized_end=366
+  _globals['_REVIJESERVICE']._serialized_start=369
+  _globals['_REVIJESERVICE']._serialized_end=699
 # @@protoc_insertion_point(module_scope)

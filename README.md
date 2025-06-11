@@ -34,9 +34,9 @@ Opis arhitekture in tehnologij.
 
 ## 🔸 Tehnologije, ki jih bomo uporabili:
 
-Backend: Node.js
-Frontend: ...
+Backend: Node.js, Python, Java SpringBoot
+Frontend: React
 Podatkovna baza: MongoDB
-Avtentikacija: ...
-API komunikacija: gRPC
+Avtentikacija: JWT Token
+API komunikacija: gRPC, Gateway
 Vodenje različic: Git + GitHub

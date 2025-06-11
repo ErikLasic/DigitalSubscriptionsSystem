@@ -54,6 +54,11 @@ class RevijeServiceStub(object):
                 request_serializer=revije__pb2.DeleteRevijaRequest.SerializeToString,
                 response_deserializer=revije__pb2.DeleteResponse.FromString,
                 _registered_method=True)
+        self.ListRevije = channel.unary_unary(
+                '/revije.RevijeService/ListRevije',
+                request_serializer=revije__pb2.ListRevijeRequest.SerializeToString,
+                response_deserializer=revije__pb2.ListRevijeResponse.FromString,
+                _registered_method=True)
 
 
 class RevijeServiceServicer(object):
@@ -83,6 +88,12 @@ class RevijeServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ListRevije(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_RevijeServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -105,6 +116,11 @@ def add_RevijeServiceServicer_to_server(servicer, server):
                     servicer.DeleteRevija,
                     request_deserializer=revije__pb2.DeleteRevijaRequest.FromString,
                     response_serializer=revije__pb2.DeleteResponse.SerializeToString,
+            ),
+            'ListRevije': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListRevije,
+                    request_deserializer=revije__pb2.ListRevijeRequest.FromString,
+                    response_serializer=revije__pb2.ListRevijeResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -215,6 +231,33 @@ class RevijeService(object):
             '/revije.RevijeService/DeleteRevija',
             revije__pb2.DeleteRevijaRequest.SerializeToString,
             revije__pb2.DeleteResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ListRevije(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/revije.RevijeService/ListRevije',
+            revije__pb2.ListRevijeRequest.SerializeToString,
+            revije__pb2.ListRevijeResponse.FromString,
             options,
             channel_credentials,
             insecure,

@@ -87,4 +87,25 @@ const deleteRevija = async (call, callback) => {
   }
 };
 
-module.exports = { createRevija, getRevija, updateRevija, deleteRevija };
+const listRevije = async (call, callback) => {
+  try {
+    const revije = await Revija.find();
+    const response = {
+      revije: revije.map(r => ({
+        id: r._id.toString(),
+        naziv: r.naziv,
+        opis: r.opis,
+      }))
+    };
+    callback(null, response);
+  } catch (error) {
+    logger.error(`Error listing Revije: ${error.message}`);
+    callback({
+      code: grpc.status.INTERNAL,
+      details: 'Could not fetch magazines'
+    });
+  }
+};
+
+
+module.exports = { createRevija, getRevija, updateRevija, deleteRevija, listRevije };

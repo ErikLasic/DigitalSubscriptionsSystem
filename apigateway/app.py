@@ -3,8 +3,10 @@ import requests
 import grpc
 import revije_pb2
 import revije_pb2_grpc
+from flask_cors import CORS  # uvozi CORS
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:8081"])  # dovoli CORS samo iz tvojega frontenda
 
 # Naslovi mikrostoritev
 USERS_SERVICE_URL = 'http://localhost:5000'  # REST uporabniki
@@ -15,7 +17,7 @@ REVIIJE_GRPC_ADDRESS = 'localhost:50051'  # gRPC revije
 channel = grpc.insecure_channel(REVIIJE_GRPC_ADDRESS)
 revije_stub = revije_pb2_grpc.RevijeServiceStub(channel)
 
-# --- Uporabniki ---
+# --- tvoje obstoječe rute ostanejo enake ---
 
 @app.route('/api/register', methods=['POST'])
 def register():
@@ -45,8 +47,6 @@ def get_user(user_id):
     else:
         return jsonify({'error': 'User not found'}), 404
 
-# --- Naročnine ---
-
 @app.route('/api/subscriptions', methods=['POST'])
 def create_subscription():
     data = request.json
@@ -74,7 +74,14 @@ def get_subscriptions_by_user(user_id):
         return jsonify(response.json())
     return jsonify({'error': 'No subscriptions found for user'}), response.status_code
 
-# --- Revije gRPC metode ---
+@app.route('/api/allMagazines', methods=['GET'])
+def list_magazines():
+    try:
+        response = revije_stub.ListRevije(revije_pb2.ListRevijeRequest())
+        magazines = [{'id': r.id, 'naziv': r.naziv, 'opis': r.opis} for r in response.revije]
+        return jsonify(magazines)
+    except grpc.RpcError:
+        return jsonify({'error': 'Could not fetch magazines'}), 500
 
 @app.route('/api/magazines', methods=['POST'])
 def create_magazine():

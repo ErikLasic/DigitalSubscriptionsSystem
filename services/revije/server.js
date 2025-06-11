@@ -2,7 +2,7 @@ const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 const mongoose = require('mongoose');
 const winston = require('winston');
-const { createRevija, getRevija, updateRevija, deleteRevija } = require('./controllers/revijeController');
+const { createRevija, getRevija, updateRevija, deleteRevija, listRevije } = require('./controllers/revijeController');
 
 // Nastavitev logiranja z Winston
 const logger = winston.createLogger({
@@ -35,6 +35,7 @@ server.addService(revijeProto.RevijeService.service, {
   GetRevija: getRevija,
   UpdateRevija: updateRevija,
   DeleteRevija: deleteRevija,
+  ListRevije: listRevije
 });
 
 server.bindAsync('0.0.0.0:50051', grpc.ServerCredentials.createInsecure(), () => {

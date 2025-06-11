@@ -7,6 +7,7 @@ service RevijeService {
   rpc GetRevija (GetRevijaRequest) returns (Revija);
   rpc UpdateRevija (UpdateRevijaRequest) returns (Revija);
   rpc DeleteRevija (DeleteRevijaRequest) returns (DeleteResponse);
+  rpc ListRevije (ListRevijeRequest) returns (ListRevijeResponse);
 }
 
 message CreateRevijaRequest {
@@ -36,4 +37,10 @@ message Revija {
 
 message DeleteResponse {
   bool success = 1;
+}
+
+message ListRevijeRequest {} // prazno telo
+
+message ListRevijeResponse {
+  repeated Revija revije = 1;
 }
