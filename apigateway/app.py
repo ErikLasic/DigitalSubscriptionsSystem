@@ -1,8 +1,8 @@
 from flask import Flask, jsonify, request
 import requests
 import grpc
-import apigatewaymobile.revije_pb2 as revije_pb2
-import apigatewaymobile.revije_pb2_grpc as revije_pb2_grpc
+import revije_pb2
+import revije_pb2_grpc
 
 app = Flask(__name__)
 
@@ -11,11 +11,24 @@ USERS_SERVICE_URL = 'http://localhost:5000'  # REST uporabniki
 SUBSCRIPTIONS_SERVICE_URL = 'http://localhost:8080'  # REST naročnine
 REVIIJE_GRPC_ADDRESS = 'localhost:50051'  # gRPC revije
 
-# grpc kanal in stub
+# gRPC kanal in stub
 channel = grpc.insecure_channel(REVIIJE_GRPC_ADDRESS)
 revije_stub = revije_pb2_grpc.RevijeServiceStub(channel)
 
 # --- Uporabniki ---
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    data = request.json
+    response = requests.post(f'{USERS_SERVICE_URL}/register', json=data)
+    return jsonify(response.json()), response.status_code
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    data = request.json
+    response = requests.post(f'{USERS_SERVICE_URL}/login', json=data)
+    return jsonify(response.json()), response.status_code
+
 @app.route('/api/users/<user_id>', methods=['GET'])
 def get_user(user_id):
     auth_header = request.headers.get('Authorization')
@@ -23,7 +36,6 @@ def get_user(user_id):
         return jsonify({'error': 'Authorization token missing'}), 401
 
     headers = {'Authorization': auth_header}
-    # Kličemo users servis na /me endpoint (ker /users/<user_id> ne obstaja)
     response = requests.get(f'{USERS_SERVICE_URL}/me', headers=headers)
 
     if response.status_code == 200:
@@ -34,12 +46,33 @@ def get_user(user_id):
         return jsonify({'error': 'User not found'}), 404
 
 # --- Naročnine ---
+
+@app.route('/api/subscriptions', methods=['POST'])
+def create_subscription():
+    data = request.json
+    response = requests.post(f'{SUBSCRIPTIONS_SERVICE_URL}/subscriptions', json=data)
+    return jsonify(response.json()), response.status_code
+
 @app.route('/api/subscriptions/<subscription_id>', methods=['GET'])
 def get_subscription(subscription_id):
     response = requests.get(f'{SUBSCRIPTIONS_SERVICE_URL}/subscriptions/{subscription_id}')
     if response.status_code == 200:
         return jsonify(response.json())
     return jsonify({'error': 'Subscription not found'}), 404
+
+@app.route('/api/subscriptions/<subscription_id>', methods=['DELETE'])
+def delete_subscription(subscription_id):
+    response = requests.delete(f'{SUBSCRIPTIONS_SERVICE_URL}/subscriptions/{subscription_id}')
+    if response.status_code == 200 or response.status_code == 204:
+        return jsonify({'message': 'Subscription deleted'})
+    return jsonify({'error': 'Subscription not found or deletion failed'}), response.status_code
+
+@app.route('/api/subscriptions/user/<user_id>', methods=['GET'])
+def get_subscriptions_by_user(user_id):
+    response = requests.get(f'{SUBSCRIPTIONS_SERVICE_URL}/subscriptions/user/{user_id}')
+    if response.status_code == 200:
+        return jsonify(response.json())
+    return jsonify({'error': 'No subscriptions found for user'}), response.status_code
 
 # --- Revije gRPC metode ---
 

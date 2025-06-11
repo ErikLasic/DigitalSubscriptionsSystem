@@ -12,11 +12,25 @@ USERS_SERVICE_URL = 'http://localhost:5000'  # REST uporabniki
 SUBSCRIPTIONS_SERVICE_URL = 'http://localhost:8080'  # REST naročnine
 REVIIJE_GRPC_ADDRESS = 'localhost:50051'  # gRPC revije
 
-# grpc kanal in stub
+# gRPC kanal in stub
 channel = grpc.insecure_channel(REVIIJE_GRPC_ADDRESS)
 revije_stub = revije_pb2_grpc.RevijeServiceStub(channel)
 
 # --- Uporabniki ---
+@app.post("/api/register")
+async def register(request: Request):
+    data = await request.json()
+    async with httpx.AsyncClient() as client:
+        response = await client.post(f"{USERS_SERVICE_URL}/register", json=data)
+    return JSONResponse(content=response.json(), status_code=response.status_code)
+
+@app.post("/api/login")
+async def login(request: Request):
+    data = await request.json()
+    async with httpx.AsyncClient() as client:
+        response = await client.post(f"{USERS_SERVICE_URL}/login", json=data)
+    return JSONResponse(content=response.json(), status_code=response.status_code)
+
 @app.get("/api/users/{user_id}")
 async def get_user(user_id: str, authorization: str = Header(None)):
     if not authorization:
@@ -25,7 +39,7 @@ async def get_user(user_id: str, authorization: str = Header(None)):
     headers = {"Authorization": authorization}
     async with httpx.AsyncClient() as client:
         response = await client.get(f"{USERS_SERVICE_URL}/me", headers=headers)
-    
+
     if response.status_code == 200:
         return response.json()
     elif response.status_code == 401:
@@ -34,15 +48,39 @@ async def get_user(user_id: str, authorization: str = Header(None)):
         raise HTTPException(status_code=404, detail="User not found")
 
 # --- Naročnine ---
+@app.post("/api/subscriptions")
+async def create_subscription(request: Request):
+    data = await request.json()
+    async with httpx.AsyncClient() as client:
+        response = await client.post(f"{SUBSCRIPTIONS_SERVICE_URL}/subscriptions", json=data)
+    return JSONResponse(content=response.json(), status_code=response.status_code)
+
 @app.get("/api/subscriptions/{subscription_id}")
 async def get_subscription(subscription_id: str):
     async with httpx.AsyncClient() as client:
         response = await client.get(f"{SUBSCRIPTIONS_SERVICE_URL}/subscriptions/{subscription_id}")
-    
     if response.status_code == 200:
         return response.json()
     else:
         raise HTTPException(status_code=404, detail="Subscription not found")
+
+@app.delete("/api/subscriptions/{subscription_id}")
+async def delete_subscription(subscription_id: str):
+    async with httpx.AsyncClient() as client:
+        response = await client.delete(f"{SUBSCRIPTIONS_SERVICE_URL}/subscriptions/{subscription_id}")
+    if response.status_code in (200, 204):
+        return {"message": "Subscription deleted"}
+    else:
+        raise HTTPException(status_code=response.status_code, detail="Subscription not found or deletion failed")
+
+@app.get("/api/subscriptions/user/{user_id}")
+async def get_subscriptions_by_user(user_id: str):
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"{SUBSCRIPTIONS_SERVICE_URL}/subscriptions/user/{user_id}")
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise HTTPException(status_code=response.status_code, detail="No subscriptions found for user")
 
 # --- Revije gRPC metode ---
 @app.post("/api/magazines")
